@@ -13,6 +13,20 @@ $watch(watchExpression, listener, [objectEquality]);
 ```
 
 Registers a listener callback to be executed whenever the watchExpression changes.
+
+#### Parameters
+
+**watchExpression**
+>Expression that is evaluated on each $digest cycle. A change in the return value triggers a call to the listener.
+* string: Evaluated as expression
+* function(scope): called with current scope as a parameter.
+
+**listener**
+>Callback called whenevern the value of watchExpression changes.
+* function(newValue, oldValue, scope)
+
+**objectEquality(optional)**
+>Compare for object equality using angular.equals instead of comparing for reference equality. (default: false)
 	
 ### $digest()
 
