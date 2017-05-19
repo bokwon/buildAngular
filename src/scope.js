@@ -6,11 +6,12 @@ function Scope() {
 };
 function initWatchVal() { };
 
-Scope.prototype.$watch = function(watchFn, listenerFn){
+Scope.prototype.$watch = function(watchFn, listenerFn, valueEq){
 	var watcher = {
 		watchFn: watchFn,
 		listenerFn: listenerFn || function(){ },
-		last: initWatchVal
+		valueEq: valueEq,
+		last: !!initWatchVal
 	};
 	this.$$watchers.push(watcher);
 	this.$$lastDirtyWatch = null;
@@ -44,6 +45,14 @@ Scope.prototype.$digest = function() {
 			throw 'Maximum iteration limit exceeded';
 		}
 	} while (dirty);
+};
+
+Scope.prototype.$$areEqual = function(newValue, oldValue, valueEq) {
+	if (valueEq) {
+		return _.isEqual(newValue, oldValue);
+	} else {
+		return newValue === oldValue;
+	}
 };
 
 module.exports = Scope;
