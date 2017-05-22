@@ -5,10 +5,10 @@ describe('Scope', function() {
 	it('can be constructed and used as an object', function() {
 		var scope = new Scope();
 		scope.aProperty = 1;
-		
+
 		expect(scope.aProperty).toBe(1);
 	});
-	describe('digest', function() {
+	describe('$digest', function() {
 		var scope;
 		beforeEach(function() {
 			scope = new Scope();
@@ -34,7 +34,7 @@ describe('Scope', function() {
 				function(scope) { return scope.someValue; },
 				function(newValue, oldValue, scope) { scope.counter++; }
 			);
-			
+
 			expect(scope.counter).toBe(0);
 			scope.$digest();
 			expect(scope.counter).toBe(1);
@@ -246,7 +246,7 @@ describe('Scope', function() {
 				}
 			);
 			scope.$watch(
-				function(scope) { 
+				function(scope) {
 					watchCalls.push('third');
 					return scope.aValue;
 				}
@@ -295,4 +295,25 @@ describe('Scope', function() {
 			expect(scope.counter).toBe(0);
 		});
 	});
+    describe('$eval', function() {
+        var scope;
+        beforeEach(function() {
+            scope = new Scope();
+        });
+
+        it('executes $evaled function and returns result', function() {
+            scope.aValue = 42;
+            var result = scope.$eval(function(scope) {
+                return scope.aValue;
+            });
+            expect(result).toBe(42);
+        });
+        it('passes the second $eval argument straight through', function() {
+            scope.aValue = 42;
+            var result = scope.$eval(function(scope, arg) {
+                return scope.aValue + arg;
+            }, 2);
+            expect(result).toBe(44);
+        });
+    });
 });

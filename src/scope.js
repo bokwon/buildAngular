@@ -19,7 +19,7 @@ Scope.prototype.$watch = function(watchFn, listenerFn, valueEq){
 	return function() {
 		var index = self.$$watchers.indexOf(watcher);
 		if (index >= 0) {
-			self.$$watchers.splice(index, 1);	
+			self.$$watchers.splice(index, 1);
 			self.$$lastDirtyWatch = null;
 		}
 	};
@@ -67,6 +67,10 @@ Scope.prototype.$$areEqual = function(newValue, oldValue, valueEq) {
 	} else {
 		return newValue === oldValue || (typeof newValue === 'number' && typeof oldValue === 'number' && isNaN(newValue) && isNaN(oldValue));
 	}
+};
+
+Scope.prototype.$eval = function(expr, locals) {
+    return expr(this, locals);
 };
 
 module.exports = Scope;
