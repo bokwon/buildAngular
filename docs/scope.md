@@ -48,3 +48,8 @@ Executes the expression on the current scope and returns the result. Any excepti
 
 $apply() is used to execute an expression in AngularJS from outside of the AngularJS framework. (e.g from browser DOM events, setTimeout, XHR or third party libraries)
 The big idea of $apply is that we can execute some code that isn't aware of Angular. This enables to integrate code to the 'Angular lifecycle' using $apply.
+
+### $evalAsync([expression], [locals])
+
+Execute the expression on the current scope at a later point in time. It will execute after the function that scheduled the evaluation (preferably before DOM rendering), At least one $digest cycle will be performed after expression execution.
+
