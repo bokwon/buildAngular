@@ -4,6 +4,7 @@ function Scope() {
 	this.$$watchers = [];
 	this.$$lastDirtyWatch = null;
 	this.$$asyncQueue = [];
+	this.$$applyAsyncQueue = [];
 	this.$$phase = null;
 };
 function initWatchVal() { };
@@ -102,6 +103,11 @@ Scope.prototype.$evalAsync = function(expr) {
 	}
 	this.$$asyncQueue.push({scope: self, expression: expr});
 };
+
+Scope.prototype.$applyAsync = function(expr) {
+	var self = this;
+	this.$$applyAsyncQueue.push({scope: self, expression: expr});
+}
 
 Scope.prototype.$beginPhase = function(phase) {
 	if (this.$$phase) {

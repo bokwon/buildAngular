@@ -426,7 +426,7 @@ describe('Scope', function() {
 			);
 			expect(function() { scope.$digest(); }).toThrow();
 		});
-		fit('schedules a digest in $evalAsync', function(done) {
+		it('schedules a digest in $evalAsync', function(done) {
 			scope.aValue = [1, 2, 3];
 			scope.counter = 0;
 			scope.$watch(
@@ -439,6 +439,49 @@ describe('Scope', function() {
 			expect(scope.counter).toBe(0);
 			setTimeout(function(){
 				expect(scope.counter).toBe(1);
+				done();
+			}, 50);
+		});
+	});
+	describe('$applyAsync', function() {
+		var scope;
+		beforeEach(function() {
+			scope = new Scope();
+		});
+		fit('allows async $apply with $applyAsync', function(done) {
+			scope.counter = 0;
+			scope.$watch(
+				function(scope) { return scope.aValue;},
+				function(newValue, oldValue, scope) {
+					scope.counter++;
+				}
+			);
+			scope.$digest();
+			expect(scope.counter).toBe(1);
+			scope.$applyAsync(function(scope) {
+				scope.aValue = "abc";
+			});
+			expect(scope.counter).toBe(1);
+			setTimeout(function() {
+				expect(scope.counter).toBe(2);
+				done();
+			}, 50);
+		});
+		fit('never executes $applyAsynced function in the same cycle', function(done) {
+			scope.aValue = [1, 2, 3];
+			scope.asyncApplied = false;
+			scope.$watch(
+				function(scope) { return scope.aValue; },
+				function(newValue, oldValue, scope) {
+					scope.$applyAsync(function(scope) {
+						scope.asyncApplied = true;
+					});
+				}
+			);
+			scope.$digest();
+			expect(scope.asyncApplied).toBe(false);
+			setTimeout(function(){
+				expect(asyncApplied).toBe(true);
 				done();
 			}, 50);
 		});

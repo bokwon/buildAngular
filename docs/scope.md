@@ -53,3 +53,7 @@ The big idea of $apply is that we can execute some code that isn't aware of Angu
 
 Execute the expression on the current scope at a later point in time. It will execute after the function that scheduled the evaluation (preferably before DOM rendering), At least one $digest cycle will be performed after expression execution.
 
+### $applyAsync([exp])
+
+Schedule the invocation of $apply to occur at a later time. The actual time difference varies across browsers, but is typically around ~10 milliseconds. This can be used to queue up multiple expressions which need to be evaluated in the same digest.
+
