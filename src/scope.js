@@ -95,6 +95,7 @@ Scope.prototype.$apply = function(expr) {
 Scope.prototype.$evalAsync = function(expr) {
 	var self = this;
 	if (!self.$$phase && !self.$$asyncQueue.length) {
+    // setTimeout call is to prevent confusion if someone was to call $evalAsync from outside a digest.	
 		setTimeout(function() {
 			if (self.$$asyncQueue.length) {
 				self.$digest();
@@ -106,8 +107,17 @@ Scope.prototype.$evalAsync = function(expr) {
 
 Scope.prototype.$applyAsync = function(expr) {
 	var self = this;
-	this.$$applyAsyncQueue.push({scope: self, expression: expr});
-}
+	this.$$applyAsyncQueue.push(function() {
+		self.$eval(expr);
+	});
+	setTimeout(function() {
+		self.$apply(function() {
+			while(self.$$applyAsyncQueue.length) {
+				self.$$applyAsyncQueue.shift()();
+			}
+		});
+	}, 0);
+};
 
 Scope.prototype.$beginPhase = function(phase) {
 	if (this.$$phase) {

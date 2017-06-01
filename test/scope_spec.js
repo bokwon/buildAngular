@@ -448,7 +448,7 @@ describe('Scope', function() {
 		beforeEach(function() {
 			scope = new Scope();
 		});
-		fit('allows async $apply with $applyAsync', function(done) {
+		it('allows async $apply with $applyAsync', function(done) {
 			scope.counter = 0;
 			scope.$watch(
 				function(scope) { return scope.aValue;},
@@ -467,7 +467,7 @@ describe('Scope', function() {
 				done();
 			}, 50);
 		});
-		fit('never executes $applyAsynced function in the same cycle', function(done) {
+		it('never executes $applyAsynced function in the same cycle', function(done) {
 			scope.aValue = [1, 2, 3];
 			scope.asyncApplied = false;
 			scope.$watch(
@@ -480,8 +480,8 @@ describe('Scope', function() {
 			);
 			scope.$digest();
 			expect(scope.asyncApplied).toBe(false);
-			setTimeout(function(){
-				expect(asyncApplied).toBe(true);
+			setTimeout(function() {
+				expect(scope.asyncApplied).toBe(true);
 				done();
 			}, 50);
 		});
