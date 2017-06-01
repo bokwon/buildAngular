@@ -294,7 +294,7 @@ describe('Scope', function() {
 			scope.$digest();
 			expect(scope.counter).toBe(0);
 		});
-		fit('has a $$phase field whose value is the current digest phase', function() {
+		it('has a $$phase field whose value is the current digest phase', function() {
 			scope.aValue = [1, 2, 3];
 			scope.phaseInWatchFunction = undefined;
 			scope.phaseInListenerFunction = undefined;
@@ -482,6 +482,26 @@ describe('Scope', function() {
 			expect(scope.asyncApplied).toBe(false);
 			setTimeout(function() {
 				expect(scope.asyncApplied).toBe(true);
+				done();
+			}, 50);
+		});
+		fit('coalesces many calls to $applyAsync', function(done) {
+			scope.counter = 0;
+			scope.$watch(
+				function(scope) { 
+					scope.counter++;
+					return scope.aValue;
+				},
+				function(newValue, oldValue, scope) {}
+			);
+			scope.$applyAsync(function(scope) {
+				scope.aValue = "abc";
+			});
+			scope.$applyAsync(function(scope) {
+				scope.aValue = "def";
+			});
+			setTimeout(function() {
+				expect(scope.counter).toBe(2);
 				done();
 			}, 50);
 		});
