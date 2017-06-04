@@ -57,3 +57,7 @@ Execute the expression on the current scope at a later point in time. It will ex
 
 Schedule the invocation of $apply to occur at a later time. The actual time difference varies across browsers, but is typically around ~10 milliseconds. This can be used to queue up multiple expressions which need to be evaluated in the same digest.
 
+### $$postDigest
+
+$$postDigest schedules a function to run "later". Specifically, the function will be run after the next digest has finished. Unlike $evalAsync or $applyAsync, scheduling a $$postDigest function does not cause a digest to be scheduled, so the function execution is delayed until the digest happens for some other reason.
+
