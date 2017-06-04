@@ -27,6 +27,10 @@ Registers a listener callback to be executed whenever the watchExpression change
 **objectEquality(optional)**
 >Compare for object equality using angular.equals instead of comparing for reference equality. (default: false)
 
+### $watchGroup(watchExpressions, listener)
+
+A variant of $watch() where it watches an array of watchExpressions. If any one expression in the collection changes the listener is executed. The items in the watchExpressions array are observed via the standard $watch operation. Their return values are examined for changes on every call to $digest. The listener is called whenever any expression in the watchExpressions array changes.
+
 ### $digest()
 
 Processes all of the watchers of the current scope and its children. Because a watcher's listener can change the model, the $digest() keeps calling the watchers until no more listeners are firing. This means that it is possible to get into an infinite loop. This function will throw 'Maximum iteration limit exceeded.' if the number of iterations exceeds 10. (TTL: Time To Live. TTL is set to 10)

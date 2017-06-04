@@ -11,7 +11,7 @@ function Scope() {
 };
 function initWatchVal() { };
 
-Scope.prototype.$watch = function(watchFn, listenerFn, valueEq){
+Scope.prototype.$watch = function(watchFn, listenerFn, valueEq) {
 	var self = this;
 	var watcher = {
 		watchFn: watchFn,
@@ -28,6 +28,10 @@ Scope.prototype.$watch = function(watchFn, listenerFn, valueEq){
 			self.$$lastDirtyWatch = null;
 		}
 	};
+};
+
+Scope.prototype.$watchGroup = function(watchFns, listenerFn) {
+	
 };
 
 Scope.prototype.$$digestOnce = function() {
