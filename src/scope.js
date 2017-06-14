@@ -1,5 +1,10 @@
 'use strict';
 var _ = require('lodash');
+
+/**
+ * 
+ * @constructor
+ */
 function Scope() {
 	this.$$watchers = [];
 	this.$$lastDirtyWatch = null;
@@ -7,9 +12,11 @@ function Scope() {
 	this.$$applyAsyncQueue = [];
 	this.$$applyAsyncId = null;
 	this.$$postDigestQueue = [];
+	this.$$children = [];
 	this.$$phase = null;
 };
 function initWatchVal() { };
+
 
 Scope.prototype.$watch = function(watchFn, listenerFn, valueEq) {
 	var self = this;
@@ -202,5 +209,16 @@ Scope.prototype.$clearPhase = function() {
 Scope.prototype.$$postDigest = function(fn) {
 	this.$$postDigestQueue.push(fn); 
 };
+
+Scope.prototype.$new = function() {
+	var ChildScope = function() {
+	};
+	ChildScope.prototype = this;
+	var child = new ChildScope();
+	this.$$children.push(child);
+	child.$$watchers = [];
+	child.$$children = [];
+	return child;
+}
 
 module.exports = Scope;
