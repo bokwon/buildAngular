@@ -2,7 +2,7 @@
 var _ = require('lodash');
 
 /**
- * 
+ * Creates and returns instance of Scope.
  * @constructor
  */
 function Scope() {
@@ -15,8 +15,8 @@ function Scope() {
 	this.$$children = [];
 	this.$$phase = null;
 };
-function initWatchVal() { };
 
+function initWatchVal() { };
 
 Scope.prototype.$watch = function(watchFn, listenerFn, valueEq) {
 	var self = this;
@@ -104,6 +104,11 @@ Scope.prototype.$$digestOnce = function() {
 	return dirty;
 };
 
+/**
+ * Processes all of the watchers of the current scope and its children. Because a watcher's listener can change the * model, the $digest() keeps calling the watchers until no more listeners are firing. This function will throw 
+ * 'Maxinum iteration limit exceeded.' if the number of iterations exceeds 10.
+ * @Scope constructor method.
+ */
 Scope.prototype.$digest = function() {
 	var ttl = 10;
 	var dirty;
@@ -210,6 +215,10 @@ Scope.prototype.$$postDigest = function(fn) {
 	this.$$postDigestQueue.push(fn); 
 };
 
+/**
+ * Creates and returns a new child scope.
+ * @Scope constructor method
+ */
 Scope.prototype.$new = function() {
 	var ChildScope = function() {
 	};
