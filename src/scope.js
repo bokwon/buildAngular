@@ -14,9 +14,9 @@ function Scope() {
 	this.$$postDigestQueue = [];
 	this.$$children = [];
 	this.$$phase = null;
-};
+}
 
-function initWatchVal() { };
+function initWatchVal() { }
 
 Scope.prototype.$watch = function(watchFn, listenerFn, valueEq) {
 	var self = this;
@@ -81,27 +81,42 @@ Scope.prototype.$watchGroup = function(watchFns, listenerFn) {
 };
 
 Scope.prototype.$$digestOnce = function() {
+	var dirty;
+	var continueLoop = true;
 	var self = this;
-	var newValue, oldValue, dirty;
-	_.forEachRight(this.$$watchers, function(watcher) {
-		try {
-			if (watcher) {
-				newValue = watcher.watchFn(self);
-				oldValue = watcher.last;
-				if (!self.$$areEqual(newValue, oldValue, watcher.valueEq)) {
-					self.$$lastDirtyWatch = watcher;
-					watcher.last = (watcher.valueEq ? _.cloneDeep(newValue) : newValue);
-					watcher.listenerFn(newValue, (oldValue === initWatchVal ? newValue: oldValue), self);
-					dirty = true;
-				} else if (self.$$lastDirtyWatch === watcher) {
-					return false;
+	this.$$everyScope(function(scope){
+		var newValue, oldValue;
+		_.forEachRight(scope.$$watchers, function(watcher) {
+			try {
+				if (watcher) {
+					newValue = watcher.watchFn(self);
+					oldValue = watcher.last;
+					if (!self.$$areEqual(newValue, oldValue, watcher.valueEq)) {
+						self.$$lastDirtyWatch = watcher;
+						watcher.last = (watcher.valueEq ? _.cloneDeep(newValue) : newValue);
+						watcher.listenerFn(newValue, (oldValue === initWatchVal ? newValue: oldValue), self);
+						dirty = true;
+					} else if (self.$$lastDirtyWatch === watcher) {
+						return false;
+					}
 				}
+			} catch(e) {
+				console.error(e);
 			}
-		} catch(e) {
-			console.error(e);
-		}
+		});
+		return continueLoop;
 	});
 	return dirty;
+};
+
+Scope.prototype.$$everyScope = function(fn) {
+	if (fn(this)) {
+		return this.$$children.every(function(child){
+			return child.$$everyScope(fn);
+		});
+	} else {
+		return false;
+	}
 };
 
 /**
@@ -186,7 +201,7 @@ Scope.prototype.$$flushApplyAsync = function() {
 		}
 	}
 	this.$$applyAsyncId = null;
-}
+};
 
 Scope.prototype.$applyAsync = function(expr) {
 	var self = this;
@@ -228,6 +243,6 @@ Scope.prototype.$new = function() {
 	child.$$watchers = [];
 	child.$$children = [];
 	return child;
-}
+};
 
 module.exports = Scope;
