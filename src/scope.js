@@ -269,12 +269,20 @@ Scope.prototype.$$postDigest = function(fn) {
  * Creates and returns a new child scope.
  * @Scope constructor method
  */
-Scope.prototype.$new = function() {
-	var ChildScope = function() {
-	};
-	ChildScope.prototype = this;
-	var child = new ChildScope();
-	this.$$children.push(child);
+Scope.prototype.$new = function(isolated) {
+  var child;
+  if (isolated) {
+    // Create an instance of Scope()
+    child = new Scope();
+  } else {
+    // Define ChildScope constructor function
+    // Assign current Scope to ChildScope.prototype
+    // Create an instance of ChildScope()
+    var ChildScope = function() { };
+    ChildScope.prototype = this;
+	  child = new ChildScope();
+  }
+  this.$$children.push(child);
 	child.$$watchers = [];
 	child.$$children = [];
 	return child;
