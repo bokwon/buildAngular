@@ -8,7 +8,7 @@ var _ = require('lodash');
 function Scope() {
 	this.$$watchers = [];
 	this.$$lastDirtyWatch = null;
-	this.$$asyncQueue = [];
+	this.$$asyncQueue = []; //store $evalAsync expression
 	this.$$applyAsyncQueue = [];
 	this.$$applyAsyncId = null;
 	this.$$postDigestQueue = [];
@@ -138,8 +138,8 @@ Scope.prototype.$digest = function() {
 	var dirty;
 	this.$root.$$lastDirtyWatch = null;
 	this.$beginPhase('$digest');
-	if (this.$$applyAsyncId) {
-		clearTimeout(this.$$applyAsyncId);
+	if (this.$root.$$applyAsyncId) {
+		clearTimeout(this.$root.$$applyAsyncId);
 		this.$$flushApplyAsync();
 	}
 	do {
@@ -203,7 +203,7 @@ Scope.prototype.$apply = function(expr) {
 
 /**
  * $evalAsync() executes the expression on the current scope at a later point in time. 
- * $evalAsync makes no guarantees as to when the expression will be executed, only that:
+ * The $evalAsync makes no guarantees as to when the expression will be executed, only that:
  * - it will execute after the function that scheduled the evaluation (preferably before DOM rendering.)
  * - at least one $digest cycle will be performed after expression execution.
  * @param {string or function()} expr - expression 
@@ -230,12 +230,12 @@ Scope.prototype.$$flushApplyAsync = function() {
 			console.error(e);	
 		}
 	}
-	this.$$applyAsyncId = null;
+	this.$root.$$applyAsyncId = null;
 };
 
 /**
- * $applyAsync() schedule the invocation of $apply to occur at a later time. The actual time difference varies across browsers, but is typically
- * around ~10 milliseconds. This can be used to queue up multiple expressions which need to be evaluated in the same digest.
+ * $applyAsync() schedule the invocation of $apply to occur at a later time. The actual time difference varies across browsers, 
+ * but is typically around ~10 milliseconds. This can be used to queue up multiple expressions which need to be evaluated in the same digest.
  * @param {string or function()} expr
  */
 Scope.prototype.$applyAsync = function(expr) {
@@ -243,8 +243,9 @@ Scope.prototype.$applyAsync = function(expr) {
 	this.$$applyAsyncQueue.push(function() {
 		self.$eval(expr);
 	});
-	if (self.$$applyAsyncId === null) {
-		self.$$applyAsyncId = setTimeout(function() {
+	if (self.$root.$$applyAsyncId === null) {
+    // setTimeout returns timeoutID which is a positive integer value which identifies the timer created by the call to setTimeout(); value can be passed to clearTimeout() to cancel the timeout.
+		self.$root.$$applyAsyncId = setTimeout(function() {
 			self.$apply(_.bind(self.$$flushApplyAsync, self));
 		}, 0);
 	}
@@ -274,6 +275,10 @@ Scope.prototype.$new = function(isolated) {
   if (isolated) {
     // Create an instance of Scope()
     child = new Scope();
+    child.$root = this.$root;
+    child.$$asyncQueue = this.$$asyncQueue;
+    child.$$postDigestQueue = this.$$postDigestQueue;
+    child.$$applyAsyncQueue = this.$$applyAsyncQueue;
   } else {
     // Define ChildScope constructor function
     // Assign current Scope to ChildScope.prototype
