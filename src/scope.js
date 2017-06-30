@@ -270,15 +270,16 @@ Scope.prototype.$$postDigest = function(fn) {
  * Creates and returns a new child scope.
  * @Scope constructor method
  */
-Scope.prototype.$new = function(isolated) {
+Scope.prototype.$new = function(isolated, parent) {
   var child;
+  parent = parent || this;
   if (isolated) {
     // Create an instance of Scope()
     child = new Scope();
-    child.$root = this.$root;
-    child.$$asyncQueue = this.$$asyncQueue;
-    child.$$postDigestQueue = this.$$postDigestQueue;
-    child.$$applyAsyncQueue = this.$$applyAsyncQueue;
+    child.$root = parent.$root;
+    child.$$asyncQueue = parent.$$asyncQueue;
+    child.$$postDigestQueue = parent.$$postDigestQueue;
+    child.$$applyAsyncQueue = parent.$$applyAsyncQueue;
   } else {
     // Define ChildScope constructor function
     // Assign current Scope to ChildScope.prototype
@@ -287,7 +288,7 @@ Scope.prototype.$new = function(isolated) {
     ChildScope.prototype = this;
 	  child = new ChildScope();
   }
-  this.$$children.push(child);
+  parent.$$children.push(child);
 	child.$$watchers = [];
 	child.$$children = [];
 	return child;
