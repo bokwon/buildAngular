@@ -977,7 +977,7 @@ describe('Scope', function() {
       hierarchyParent.$digest();
       expect(child.counter).toBe(2);
     });
-    fit('is no longer digested when $destroy has been called', function() {
+    it('is no longer digested when $destroy has been called', function() {
       var parent = new Scope();
       var child = parent.$new();
       child.aValue = [1, 2, 3];

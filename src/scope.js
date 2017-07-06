@@ -291,7 +291,24 @@ Scope.prototype.$new = function(isolated, parent) {
   parent.$$children.push(child);
 	child.$$watchers = [];
 	child.$$children = [];
+  child.$parent = parent;
 	return child;
+};
+
+/**
+ * $destroy will find the current scope from its parent's $$children array and then remove it. 
+ * It will also remove the watchers of the scope.
+ * @Scope constructor method
+ */
+Scope.prototype.$destroy = function() {
+  if (this.$parent) {
+    var siblings = this.$parent.$$children;
+    var indexOfThis = siblings.indexOf(this);
+    if (indexOfThis >= 0) {
+      siblings.splice(indexOfThis, 1);
+    }
+  }
+  this.$$watchers = null;
 };
 
 module.exports = Scope;
