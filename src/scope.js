@@ -311,4 +311,28 @@ Scope.prototype.$destroy = function() {
   this.$$watchers = null;
 };
 
+/**
+  * $watchCollection shallow watches the properties of an object and fires whenever any of the properties change 
+  * (for arrays, this implies watching the array items; for object maps, this implies watching the properties).
+  * If a change is detected, the listener callback is fired.
+  */
+Scope.prototype.$watchCollection = function(watchFn, listenerFn) {
+  var self = this;
+  var newValue;
+  var oldValue;
+  var changeCount = 0;
+  var internalWatchFn = function(scope) {
+    newValue = watchFn(scope);
+    if (newValue !== oldValue) {
+      changeCount++;
+    }
+    oldValue = newValue;
+    return changeCount;
+  };
+  var internalListenerFn = function() {
+    listenerFn(newValue, oldValue, self);
+  };
+  return this.$watch(internalWatchFn, internalListenerFn);
+};
+
 module.exports = Scope;
