@@ -1005,7 +1005,7 @@ describe('Scope', function() {
     beforeEach(function() {
       scope = new Scope();
     });
-    fit('works like a normal watch for non-collections', function() {
+    it('works like a normal watch for non-collections', function() {
       var valueProvided;
       scope.aValue = 42;
       scope.counter = 0;
@@ -1024,6 +1024,20 @@ describe('Scope', function() {
       expect(scope.counter).toBe(2);
       scope.$digest();
       expect(scope.counter).toBe(2);
+    });
+    fit('works like a normal watch for NaNs', function() {
+      scope.aValue = 0/0;
+      scope.counter = 0;
+      scope.$watchCollection(
+        function(scope) { return scope.aValue; },
+        function(newValue, oldValue, scope) {
+          scope.counter++;
+        }
+      );
+      scope.$digest();
+      expect(scope.counter).toBe(1);
+      scope.$digest();
+      expect(scope.counter).toBe(1);
     });
   });
 });

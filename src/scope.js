@@ -166,6 +166,12 @@ Scope.prototype.$digest = function() {
 	}
 };
 
+/**
+ * $$areEqual() is using Lodash _isEqual() method to check by value. Checking by value is a more involved operation than just checking
+ * a reference. Angular does not do value-based dirty checking by default. You need to explicitly set the flag to enable it.
+ * Need to handle value being NaN since NaN(Not-a-Number) is not equal to itself.
+ * Lodash: _isEqual(value, other) method performs a deep comparison between two values to determine if they are equivalent. 
+ */
 Scope.prototype.$$areEqual = function(newValue, oldValue, valueEq) {
 	if (valueEq) {
 		return _.isEqual(newValue, oldValue);
@@ -323,7 +329,7 @@ Scope.prototype.$watchCollection = function(watchFn, listenerFn) {
   var changeCount = 0;
   var internalWatchFn = function(scope) {
     newValue = watchFn(scope);
-    if (newValue !== oldValue) {
+    if (!self.$$areEqual(newValue, oldValue, false)) {
       changeCount++;
     }
     oldValue = newValue;
