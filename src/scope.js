@@ -339,6 +339,13 @@ Scope.prototype.$watchCollection = function(watchFn, listenerFn) {
           changeCount++;
           oldValue.length = newValue.length;
         }
+        // detect different array value between newValue and oldValue
+        _.forEach(newValue, function(newItem, i) {
+          if (newItem !== oldValue[i]) {
+            changeCount++;
+            oldValue[i] = newItem;
+          }
+        });
       } else {
       }
     } else {
