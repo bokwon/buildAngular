@@ -1123,7 +1123,7 @@ describe('Scope', function() {
       scope.$digest();
       expect(scope.counter).toBe(2);
     });
-    fit('does not fail on NaNs in arrays', function() {
+    it('does not fail on NaNs in arrays', function() {
       scope.arr = [2, NaN, 3];
       scope.counter = 0;
       scope.$watchCollection(
@@ -1134,6 +1134,44 @@ describe('Scope', function() {
       );
       scope.$digest();
       expect(scope.counter).toBe(1);
+    });
+    it('notices an item replaced in an arguments object', function() {
+      (function() {
+        scope.arrayLike = arguments;
+      })(1, 2, 3);
+      scope.counter = 0;
+      scope.$watchCollection(
+        function(scope) { return scope.arrayLike; },
+        function(newValue, oldValue, scope) {
+          scope.counter++;
+        }
+      );
+      scope.$digest();
+      expect(scope.counter).toBe(1);
+      scope.arrayLike[1] = 42;
+      scope.$digest();
+      expect(scope.counter).toBe(2);
+      scope.$digest();
+      expect(scope.counter).toBe(2);
+    });
+    // NodeList objects are collections of nodes such as those returned by properties such as Node.childNodes and document.querySelectorAll()
+    it('notices an item replaced in a NodeList object', function() {
+      document.documentElement.appendChild(document.createElement('div'));
+      scope.arrayLike = document.getElementsByTagName('div');
+      scope.counter = 0;
+      scope.$watchCollection(
+        function(scope) { return scope.arrayLike; },
+        function(newValue, oldValue, scope) {
+          scope.counter++;
+        }
+      );
+      scope.$digest();
+      expect(scope.counter).toBe(1);
+      document.documentElement.appendChild(document.createElement('div'));
+      scope.$digest();
+      expect(scope.counter).toBe(2);
+      scope.$digest();
+      expect(scope.counter).toBe(2);
     });
   });
 });
