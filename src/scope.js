@@ -341,7 +341,9 @@ Scope.prototype.$watchCollection = function(watchFn, listenerFn) {
         }
         // detect different array value between newValue and oldValue
         _.forEach(newValue, function(newItem, i) {
-          if (newItem !== oldValue[i]) {
+          // NaN === NaN returns false. Therefore, NaN is always triggering a change, causing an infinite digest.
+          var bothNaN = _.isNaN(newItem) && _.isNaN(oldValue[i]);
+          if (!bothNaN && newItem !== oldValue[i]) {
             changeCount++;
             oldValue[i] = newItem;
           }
