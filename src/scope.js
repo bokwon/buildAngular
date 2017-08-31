@@ -323,43 +323,9 @@ Scope.prototype.$destroy = function() {
   * If a change is detected, the listener callback is fired.
   */
 Scope.prototype.$watchCollection = function(watchFn, listenerFn) {
-  var self = this;
-  var newValue;
-  var oldValue;
-  var changeCount = 0;
   var internalWatchFn = function(scope) {
-    newValue = watchFn(scope);
-    if (_.isObject(newValue)) {
-      if (_.isArrayLike(newValue)) {
-        if (!_.isArray(oldValue)) {
-          changeCount++;
-          oldValue = [];
-        } 
-        if (newValue.length !== oldValue.length) {
-          changeCount++;
-          oldValue.length = newValue.length;
-        }
-        // detect different array value between newValue and oldValue
-        _.forEach(newValue, function(newItem, i) {
-          // NaN === NaN returns false. Therefore, NaN is always triggering a change, causing an infinite digest.
-          var bothNaN = _.isNaN(newItem) && _.isNaN(oldValue[i]);
-          if (!bothNaN && newItem !== oldValue[i]) {
-            changeCount++;
-            oldValue[i] = newItem;
-          }
-        });
-      } else {
-      }
-    } else {
-      if (!self.$$areEqual(newValue, oldValue, false)) {
-        changeCount++;
-      }
-      oldValue = newValue;
-    }
-    return changeCount;
   };
   var internalListenerFn = function() {
-    listenerFn(newValue, oldValue, self);
   };
   return this.$watch(internalWatchFn, internalListenerFn);
 };

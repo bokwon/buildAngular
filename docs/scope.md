@@ -65,3 +65,24 @@ Schedule the invocation of $apply to occur at a later time. The actual time diff
 
 $$postDigest schedules a function to run "later". Specifically, the function will be run after the next digest has finished. Unlike $evalAsync or $applyAsync, scheduling a $$postDigest function does not cause a digest to be scheduled, so the function execution is delayed until the digest happens for some other reason.
 
+### $watch() vs $watchCollection()
+
+$watch will be triggered by:
+``` javascript
+  $scope.myArray = [];
+  $scope.myArray = null;
+  $scope.myArray = someOtherArray;
+```
+
+$watchCollection will be triggered by everything above AND:
+``` javascript
+  $scope.myArray.push({});
+  $scope.myArray.splice(0, 1);
+  $scope.myArray[0] = {};
+```
+
+$watch(..., true) will be triggered by Everything above AND:
+``` javascript
+  $scope.myArray[0].someProperty = "someValue";
+```
+

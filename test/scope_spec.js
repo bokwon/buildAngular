@@ -1005,7 +1005,7 @@ describe('Scope', function() {
     beforeEach(function() {
       scope = new Scope();
     });
-    it('works like a normal watch for non-collections', function() {
+    fit('works like a normal watch for non-collections', function() {
       var valueProvided;
       scope.aValue = 42;
       scope.counter = 0;
