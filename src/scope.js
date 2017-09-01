@@ -34,6 +34,7 @@ Scope.prototype.$watch = function(watchFn, listenerFn, valueEq) {
 		valueEq: !!valueEq,
 		last: initWatchVal
 	};
+  // Array.prototype.unshift() method adds one or more elements to the beginning of an array and returns the new length of the array.
 	this.$$watchers.unshift(watcher);
 	this.$root.$$lastDirtyWatch = null;
 	return function() {
@@ -323,9 +324,21 @@ Scope.prototype.$destroy = function() {
   * If a change is detected, the listener callback is fired.
   */
 Scope.prototype.$watchCollection = function(watchFn, listenerFn) {
+  var self = this;
+  var newValue;
+  var oldValue;
+  var changeCount = 0;
   var internalWatchFn = function(scope) {
+    newValue = watchFn(scope);
+    // NaNs are not equal to each other.
+    if (!self.$$areEqual(newValue, oldValue, false)) {
+      changeCount++;
+    }
+    oldValue = newValue;
+    return changeCount;
   };
   var internalListenerFn = function() {
+    listenerFn(newValue, oldValue, self);
   };
   return this.$watch(internalWatchFn, internalListenerFn);
 };
