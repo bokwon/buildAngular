@@ -330,11 +330,26 @@ Scope.prototype.$watchCollection = function(watchFn, listenerFn) {
   var changeCount = 0;
   var internalWatchFn = function(scope) {
     newValue = watchFn(scope);
-    // NaNs are not equal to each other.
-    if (!self.$$areEqual(newValue, oldValue, false)) {
-      changeCount++;
+    if (_.isObject(newValue)) {
+      if (_.isArray(newValue)) {
+          if (!_.isArray(oldValue)) {
+            changeCount++;
+            oldValue = [];
+          } 
+          if (oldValue.length !== newValue.length) {
+            changeCount++;
+            oldValue.length = newValue.length;
+          } 
+      } else {
+        
+      }
+    } else {
+      // NaNs are not equal to each other.
+      if (!self.$$areEqual(newValue, oldValue, false)) {
+        changeCount++;
+      }
+      oldValue = newValue;
     }
-    oldValue = newValue;
     return changeCount;
   };
   var internalListenerFn = function() {

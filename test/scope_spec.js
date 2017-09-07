@@ -1039,7 +1039,7 @@ describe('Scope', function() {
       scope.$digest();
       expect(scope.counter).toBe(1);
     });
-    fit('notices when the value becomes an array', function() {
+    it('notices when the value becomes an array', function() {
       scope.counter = 0;
       scope.$watchCollection(
         function(scope) { return scope.arr; },
@@ -1055,7 +1055,7 @@ describe('Scope', function() {
       scope.$digest();
       expect(scope.counter).toBe(2);
     });
-    it('notices an item added to an array', function() {
+    fit('notices an item added to an array', function() {
       scope.arr = [1, 2, 3];
       scope.counter = 0;
       scope.$watchCollection(
