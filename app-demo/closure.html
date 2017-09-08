@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Closure Example</title>
+    <script type="text/javascript">
+      // Functions can always remember the variables that they could see at creation.
+      
+      // Scope - Where you are in the code. What you can see in the code from where you are.
+      // Scopes: local(define inside your function, closure(it's not inside your current function, but the variable is defined in other enclosing function, global - in browser, it's window object)
+      
+      (function enclosingFunction(){
+        var name = 'bo';
+        
+        function sayName1(){
+          console.log(name);
+        }
+        
+        window.sayName1 = sayName1;
+      })();
+        
+      (function(){
+        var name = 'paul';
+      
+        function sayName2() {
+          console.log(name);
+        }
+    
+        window.sayName2 = sayName2;
+      })();  
+    </script>
+  </head>
+  <body>  
+  </body>
+</html>

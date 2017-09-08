@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>JSTimer</title>
+    <script type="text/javascript">
+      (function(){
+        var timeoutId;
+        var intervalId;
+        
+        var timeOutAlert = function() {
+          timeoutId = window.setTimeout(showTimeoutAlert, 1000);
+        }
+        
+        var showTimeoutAlert = function() {
+          console.log("alert from setTimeout function.");
+        }
+        
+        var cancelTimeout = function() {
+          window.clearTimeout(timeoutId);
+        }
+        
+        var intervalAlert = function() {
+          intervalId = window.setInterval(showIntervalAlert, 2000);
+        }
+        
+        var showIntervalAlert = function() {
+          console.log("alert from setInterval function.");
+        }
+        
+        var cancelInterval = function() {
+          window.clearInterval(intervalId);
+        }
+        
+        window.timeOutAlert = timeOutAlert;
+        window.intervalAlert = intervalAlert;
+        window.cancelTimeout = cancelTimeout;
+        window.cancelInterval = cancelInterval;
+        
+      })();
+      
+    </script>
+  </head>
+  <body> 
+    <button onclick="timeOutAlert();">Show alert after 1 second</button>
+    <button onclick="intervalAlert();">Show alert every 2 seconds</button>
+    <button onclick="cancelTimeout();">Cancel setTimeout</button>
+    <button onclick="cancelInterval();">Cancel setInterval</button>
+  </body>
+</html>
