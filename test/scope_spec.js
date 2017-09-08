@@ -1055,7 +1055,7 @@ describe('Scope', function() {
       scope.$digest();
       expect(scope.counter).toBe(2);
     });
-    fit('notices an item added to an array', function() {
+    it('notices an item added to an array', function() {
       scope.arr = [1, 2, 3];
       scope.counter = 0;
       scope.$watchCollection(
@@ -1135,7 +1135,7 @@ describe('Scope', function() {
       scope.$digest();
       expect(scope.counter).toBe(1);
     });
-    it('notices an item replaced in an arguments object', function() {
+    fit('notices an item replaced in an arguments object', function() {
       (function() {
         scope.arrayLike = arguments;
       })(1, 2, 3);
