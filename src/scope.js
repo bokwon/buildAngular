@@ -361,6 +361,13 @@ Scope.prototype.$watchCollection = function(watchFn, listenerFn) {
           changeCount++;
           oldValue = {};
         }
+        _.forOwn(newValue, function(value, key) {
+          var bothNaN = _.isNaN(value) && _.isNaN(oldValue[key]);
+          if (!bothNaN && (value !== oldValue[key])) {
+            changeCount++;
+            oldValue[key] = value;
+          }
+        });
       }
     } else {
       // NaNs are not equal to each other.
