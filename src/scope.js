@@ -336,8 +336,10 @@ Scope.prototype.$watchCollection = function(watchFn, listenerFn) {
   var self = this;
   var newValue;
   var oldValue;
+  var oldLength;
   var changeCount = 0;
   var internalWatchFn = function(scope) {
+    var newLength;
     newValue = watchFn(scope);
     if (_.isObject(newValue)) {
       if (isArrayLike(newValue)) {
@@ -360,14 +362,35 @@ Scope.prototype.$watchCollection = function(watchFn, listenerFn) {
         if (!_.isObject(oldValue) || isArrayLike(oldValue)) {
           changeCount++;
           oldValue = {};
+          oldLength = 0;
         }
-        _.forOwn(newValue, function(value, key) {
-          var bothNaN = _.isNaN(value) && _.isNaN(oldValue[key]);
-          if (!bothNaN && (value !== oldValue[key])) {
+        newLength = 0;
+        _.forOwn(newValue, function(newVal, key) {
+          newLength++;
+          if (oldValue.hasOwnProperty(key)) {
+            // Object attribute is modified.
+            var bothNaN = _.isNaN(newVal) && _.isNaN(oldValue[key]);
+            if (!bothNaN && (oldValue[key] !== newVal)) {
+              changeCount++;
+              oldValue[key] = newVal;
+            }
+          } else {
+            // Object attribute is added.
             changeCount++;
-            oldValue[key] = value;
+            oldLength++;
+            oldValue[key] = newVal;
           }
         });
+        // Object attribute is removed.         
+        if (oldLength > newLength) {
+          _.forOwn(oldValue, function(oldVal, key) {
+            if (!newValue.hasOwnProperty(key)) {
+              changeCount++;
+              oldLength--;
+              delete oldValue[key];
+            }
+          });
+        }
       }
     } else {
       // NaNs are not equal to each other.
