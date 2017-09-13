@@ -1265,7 +1265,21 @@ describe('Scope', function() {
       scope.obj.newKey = "def";
       scope.$digest();
       expect(scope.counter).toBe(2);
-    })
+    });
+    fit('gives the old non-collection value to listener', function() {
+      scope.aValue = 42;
+      var oldValueGiven;
+      scope.$watchCollection(
+        function(scope) { return scope.aValue; },
+        function(newValue, oldValue, scope) {
+          oldValueGiven = oldValue;
+        }
+      );
+      scope.$digest();
+      scope.aValue = 43;
+      scope.$digest();
+      expect(oldValueGiven).toBe(42);
+    });
   });
 });
 
