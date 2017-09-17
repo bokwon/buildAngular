@@ -1308,7 +1308,7 @@ describe('Scope', function() {
 			scope.$digest();
 			expect(oldValueGiven).toEqual({a:1, b:2});
 		});
-		fit('uses the new value as the old value on first digest', function() {
+		it('uses the new value as the old value on first digest', function() {
 			scope.aValue = {a:1, b:2};
 			var oldValueGiven;
 			scope.$watchCollection(
@@ -1321,5 +1321,17 @@ describe('Scope', function() {
 			expect(oldValueGiven).toEqual({a:1, b:2});
 		});
   });
+	describe('Events', function() {
+		var parent;
+		var scope;
+		var child;
+		var isolatedChild;
+		beforeEach(function() {
+			parent = new Scope();
+			scope = parent.$new();
+			child = scope.$new();
+			isolatedChild = scope.$new(true);
+		});
+	});
 });
 

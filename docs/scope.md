@@ -86,3 +86,10 @@ $watch(..., true) will be triggered by Everything above AND:
   $scope.myArray[0].someProperty = "someValue";
 ```
 
+### $new(isolate, parent);
+
+```javascript
+	$new(isolate, parent);
+	//Create a new child scope.
+```
+
