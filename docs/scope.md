@@ -90,6 +90,25 @@ $watch(..., true) will be triggered by Everything above AND:
 
 ```javascript
 	$new(isolate, parent);
-	//Create a new child scope.
+	//Create a new child scope. Returns the newly created child scope.
 ```
 
+### $on(name, listener);
+
+Listens on events of a given type. 
+The event object passed into the listener has the following attributes:
+- targetScope {scope}: the scope on which the event was $emit-ed or $broadcast-ed. 
+- currentScope {scope}: the scope that is currently handling the event. Once the event propagates through the scope hierarchy, this property is set to null.
+- name {string}: name of the event.
+- stopPropagtaion
+- preventDefault
+- defaultPrevented
+Returns a deregistration function for this listener.
+
+``` javascript
+  $on(name, function(event, ...args));
+```
+
+### $emit(name, args);
+
+Dispatches an event name upwards through the scope hierarchy notifying the registered $rootScope.Scope listeners. All listeners listening for name event on this scope get notified. Afterwards, the event traverses upwards toward the root scope and calls all registered listeners along the way. The event will stop propagating if one of the listeners cancels it.
