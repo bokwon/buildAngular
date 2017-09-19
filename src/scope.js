@@ -429,18 +429,22 @@ Scope.prototype.$on = function(eventName, listener) {
   listeners.push(listener);
 };
 
-Scope.prototype.$emit = function(eventName, args) {
-  this.$$fireEventOnScope(eventName);
+Scope.prototype.$emit = function(eventName) {
+	var additonalArgs = _.tail(arguments);
+  this.$$fireEventOnScope(eventName, additonalArgs);
 };
 
-Scope.prototype.$broadcast = function(eventName, args) {
-  this.$$fireEventOnScope(eventName);
+Scope.prototype.$broadcast = function(eventName) {
+  var additonalArgs = _.tail(arguments);
+  this.$$fireEventOnScope(eventName, additonalArgs);
 };
 
-Scope.prototype.$$fireEventOnScope = function(eventName) {
+Scope.prototype.$$fireEventOnScope = function(eventName, additionalArgs) {
+	var event = {name: eventName};
+	var listenerArgs = [event].concat(additionalArgs);
   var listeners = this.$$listeners[eventName] || [];
   _.forEach(listeners, function(listener) {
-    listener();
+    listener.apply(null, listenerArgs);
   });
 };
 
