@@ -421,31 +421,51 @@ Scope.prototype.$watchCollection = function(watchFn, listenerFn) {
 };
 
 Scope.prototype.$on = function(eventName, listener) {
+  //var self = this;
   var listeners = this.$$listeners[eventName];
   // [] is truthy. The only values that are falsey are: null, undefined, 0, NaN, "", false
   if (!listeners) { // !undefined => true
     this.$$listeners[eventName] = listeners = [];
   }
   listeners.push(listener);
+  return function() {
+    var index = listeners.indexOf(listener);
+    if (index >= 0) {
+      listeners[index] = null;
+    }
+  };
+//  return function() {
+//    var found = self.$$listeners[eventName].length;
+//    if (found === 1) {
+//      delete self.$$listeners[eventName];
+//    }
+//  };
 };
 
 Scope.prototype.$emit = function(eventName) {
 	var additonalArgs = _.tail(arguments);
-  this.$$fireEventOnScope(eventName, additonalArgs);
+  return this.$$fireEventOnScope(eventName, additonalArgs);
 };
 
 Scope.prototype.$broadcast = function(eventName) {
   var additonalArgs = _.tail(arguments);
-  this.$$fireEventOnScope(eventName, additonalArgs);
+  return this.$$fireEventOnScope(eventName, additonalArgs);
 };
 
 Scope.prototype.$$fireEventOnScope = function(eventName, additionalArgs) {
 	var event = {name: eventName};
 	var listenerArgs = [event].concat(additionalArgs);
   var listeners = this.$$listeners[eventName] || [];
-  _.forEach(listeners, function(listener) {
-    listener.apply(null, listenerArgs);
-  });
+  var i = 0;
+  while (i < listeners.length){
+    if (listeners[i] === null) {
+      listeners.splice(i, 1);
+    } else {
+      listeners[i].apply(null, listenerArgs);
+      i++;
+    }
+  }
+  return event;
 };
 
 module.exports = Scope;
