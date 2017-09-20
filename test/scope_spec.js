@@ -1402,7 +1402,7 @@ describe('Scope', function() {
         scope[method]('someEvent');
         expect(listener).not.toHaveBeenCalled();
       });
-      fit('does not skip the next listener when removed on'+method, function() {
+      it('does not skip the next listener when removed on'+method, function() {
         var deregister;
         var listener = function() {
           deregister();
@@ -1413,6 +1413,15 @@ describe('Scope', function() {
         scope[method]('someEvent');
         expect(nextListener).toHaveBeenCalled();
       });
+    });
+    fit('propagates up the scope hierachy on $emit', function() {
+      var parentListener = jasmine.createSpy();
+      var scopeListener = jasmine.createSpy();
+      parent.$on('someEvent', parentListener);
+      scope.$on('someEvent', scopeListener);
+      scope.$emit('someEvent');
+      expect(scopeListener).toHaveBeenCalled();
+      expect(parentListener).toHaveBeenCalled();
     });
 	});
 });
