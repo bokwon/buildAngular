@@ -1414,7 +1414,7 @@ describe('Scope', function() {
         expect(nextListener).toHaveBeenCalled();
       });
     });
-    fit('propagates up the scope hierachy on $emit', function() {
+    it('propagates up the scope hierachy on $emit', function() {
       var parentListener = jasmine.createSpy();
       var scopeListener = jasmine.createSpy();
       parent.$on('someEvent', parentListener);
@@ -1423,6 +1423,16 @@ describe('Scope', function() {
       expect(scopeListener).toHaveBeenCalled();
       expect(parentListener).toHaveBeenCalled();
     });
+		it('propagates the same event up on $emit', function() {
+			var parentListener = jasmine.createSpy();
+			var scopeListener = jasmine.createSpy();
+			parent.$on('someEvent', parentListener);
+			scope.$on('someEvent', scopeListener);
+			scope.$emit('someEvent');
+			var scopeEvent = scopeListener.calls.mostRecent().args[0];
+			var parentEvent = parentListener.calls.mostRecent().args[0];
+			expect(scopeEvent).toBe(parentEvent);
+		});
 	});
 });
 
