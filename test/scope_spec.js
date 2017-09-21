@@ -1433,6 +1433,18 @@ describe('Scope', function() {
 			var parentEvent = parentListener.calls.mostRecent().args[0];
 			expect(scopeEvent).toBe(parentEvent);
 		});
+    fit('propagates down the scope hierachy on $broadcast', function() {
+      var scopeListener = jasmine.createSpy();
+      var childListener = jasmine.createSpy();
+      var isolatedChildListener = jasmine.createSpy();
+      scope.$on('someEvent', scopeListener);
+      child.$on('someEvent', childListener);
+      isolatedChild.$on('someEvent', isolatedChildListener);
+      scope.$broadcast('someEvent');
+      expect(scopeListener).toHaveBeenCalled();
+      expect(childListener).toHaveBeenCalled();
+      expect(isolatedChildListener).toHaveBeenCalled();
+    })
 	});
 });
 
