@@ -96,17 +96,20 @@ $watch(..., true) will be triggered by Everything above AND:
 ### $on(name, listener);
 
 Listens on events of a given type. 
-The event object passed into the listener has the following attributes:
-- targetScope {scope}: the scope on which the event was $emit-ed or $broadcast-ed. 
-- currentScope {scope}: the scope that is currently handling the event. Once the event propagates through the scope hierarchy, this property is set to null.
-- name {string}: name of the event.
-- stopPropagtaion
-- preventDefault
-- defaultPrevented
 Returns a deregistration function for this listener.
 
 ``` javascript
   $on(name, function(event, ...args));
+  
+  //event object 
+  {
+    targetScope:{Scope}:the scope on which the event was $emit-ed or $broadcast-ed.
+    currentScope: {Scope}: the scope that is currently handling the event. Once the event propagates through the scope hierarchy, this property is set to null.
+    name:{string}: name of the event.
+    stopPropagation:{function=}
+    preventDefault:{function}
+    defaultPrevented:{boolean} 
+  }
 ```
 
 ### $emit(name, args);

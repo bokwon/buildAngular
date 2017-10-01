@@ -421,6 +421,10 @@ Scope.prototype.$watchCollection = function(watchFn, listenerFn) {
 };
 
 Scope.prototype.$on = function(eventName, listener) {
+//  var event = {
+//    name: eventName,
+//    targetScope: this
+//  }
   var listeners = this.$$listeners[eventName];
   // [] is truthy. The only values that are falsey are: null, undefined, 0, NaN, "", false
   if (!listeners) { // !undefined => true
@@ -436,23 +440,27 @@ Scope.prototype.$on = function(eventName, listener) {
 };
 
 Scope.prototype.$emit = function(eventName) {
-	var event = {name: eventName};
+	var event = {name: eventName, targetScope: this};
 	var listenerArgs = [event].concat(_.tail(arguments));
   var scope = this;
   do {
+    event.currentScope = scope;
     scope.$$fireEventOnScope(eventName, listenerArgs);
     scope = scope.$parent;
   } while (scope);
+  event.currentScope = null;
 	return event;
 };
 
 Scope.prototype.$broadcast = function(eventName) {
-	var event = {name: eventName};
+	var event = {name: eventName, targetScope: this};
   var listenerArgs = [event].concat(_.tail(arguments));
 	this.$$everyScope(function(scope){
+    event.currentScope = scope;
 		scope.$$fireEventOnScope(eventName, listenerArgs);
 		return true;
 	});
+  event.currentScope = null;
 	return event;
 };
 
