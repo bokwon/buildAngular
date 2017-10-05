@@ -1413,6 +1413,14 @@ describe('Scope', function() {
         scope[method]('someEvent');
         expect(nextListener).toHaveBeenCalled();
       });
+			it('is sets defaultPrevented when preventDefault called on '+method, function() {
+				 var listener = function(event) {
+					 event.preventDefault();
+				 };
+				 scope.$on('someEvent', listener);
+				 var event = scope[method]('someEvent');
+				 expect(event.defaultPrevented).toBe(true);
+			});
     });
     it('propagates up the scope hierachy on $emit', function() {
       var parentListener = jasmine.createSpy();
@@ -1510,7 +1518,7 @@ describe('Scope', function() {
       scope.$emit('someEvent');
       expect(event.currentScope).toBe(null);
     });
-    fit('sets currentScope to null after propagation on $broadcast', function() {
+    it('sets currentScope to null after propagation on $broadcast', function() {
       var event;
       var scopeListener = function(evt) {
         event = evt;
@@ -1519,6 +1527,26 @@ describe('Scope', function() {
       scope.$broadcast('someEvent');
       expect(event.currentScope).toBe(null);
     });
+		it('does not propagate to parents when stopped', function() {
+			var scopeListener = function(event) {
+				event.stopPropagation();
+			};
+			var parentListener = jasmine.createSpy();
+			scope.$on('someEvent', scopeListener);
+			parent.$on('someEvent', parentListener);
+			scope.$emit('someEvent');
+			expect(parentListener).not.toHaveBeenCalled();
+		});
+		it('it received by listeners on current scope after being stopped', function() {
+			var listener1 = function(event) {
+				event.stopPropagation();
+			};
+			var listener2 = jasmine.createSpy();
+			scope.$on('someEvent', listener1);
+			scope.$on('someEvent', listener2);
+			scope.$emit('someEvent');
+			expect(listener2).toHaveBeenCalled();
+		})
 	});
 });
 
