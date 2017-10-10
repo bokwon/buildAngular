@@ -16,7 +16,7 @@ describe('parse', function() {
 		expect(fn).toBeDefined();
 		expect(fn()).toBe(0.42);
 	});
-	fit('can parse a number in scientific notation', function() {
+	it('can parse a number in scientific notation', function() {
 		var fn = parse('42e3');
 		expect(fn()).toBe(42000);
 	});

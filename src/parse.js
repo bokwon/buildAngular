@@ -18,7 +18,7 @@ Lexer.prototype.lex = function(text) {
 	while(this.index < this.text.length) {
 		this.ch = this.text.charAt(this.index);
 		if (this.isNumber(this.ch) || 
-			 (this.ch === '.' && this.isNumber(this.peek()))) {
+			 (this.ch === '.' && this.peek())){
 			this.readNumber();
 		} else {
 			throw 'Unexpected next character: ' + this.ch;
@@ -36,8 +36,8 @@ Lexer.prototype.peek = function() {
 };
 
 Lexer.prototype.isExpOperator = function(ch) {
-	return this.ch === '-' || this.ch === '+' || this.isNumber(ch);
-}
+	return ch === '-' || ch === '+' || this.isNumber(ch);
+};
 
 Lexer.prototype.readNumber = function() {
 	var number = '';
@@ -46,7 +46,17 @@ Lexer.prototype.readNumber = function() {
 		if (ch === '.' || this.isNumber(ch)){
 			number += ch;
 		} else {
-			break;
+        var nextCh = this.peek();
+        var prevCh = number.charAt(number.length - 1);
+        if (ch === 'e' && this.isExpOperator(nextCh)) {
+            number += ch;
+        } else if (this.isExpOperator(ch) && prevCh === 'e' && nextCh && this.isNumber(nextCh)) {
+            number += ch;
+        } else if (this.isExpOperator(ch) && prevCh === 'e' && !nextCh && !this.isNumber(nextCh)) {
+            throw 'invalid exponent';
+        } else {
+            break;
+        }
 		}
 		this.index++;
 	}
@@ -59,7 +69,7 @@ Lexer.prototype.readNumber = function() {
 //Abstract Syntax Tree (AST) builder
 function AST(lexer) {
 	this.lexer = lexer;
-}
+};
 AST.Program = 'Program';
 AST.Literal = 'Literal';
 
@@ -75,11 +85,11 @@ AST.prototype.program = function() {
 
 AST.prototype.constant = function() {
 	return {type: AST.Literal, value: this.tokens[0].value};
-}
+};
 
 function ASTCompiler(astBuilder) {
 	this.astBuilder = astBuilder;
-}
+};
 
 ASTCompiler.prototype.compile = function(text) {
 	var ast = this.astBuilder.ast(text);
