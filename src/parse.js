@@ -1,12 +1,14 @@
 'use strict';
+var _ = require('lodash');
+
 function parse(expr) {
 	var lexer = new Lexer();
 	var parser = new Parser(lexer);
 	return parser.parse(expr);
-}
+};
 
 function Lexer() {	
-}
+};
 
 Lexer.prototype.lex = function(text) {
 	// Tokenization will be done here.
@@ -20,7 +22,9 @@ Lexer.prototype.lex = function(text) {
 		if (this.isNumber(this.ch) || 
 			 (this.ch === '.' && this.peek())){
 			this.readNumber();
-		} else {
+		} else if (this.ch === '"' || this.ch === '\'') {
+      this.readString(this.ch);
+    } else {
 			throw 'Unexpected next character: ' + this.ch;
 		}
 	}
@@ -66,6 +70,26 @@ Lexer.prototype.readNumber = function() {
 	});
 };
 
+Lexer.prototype.readString = function(quote) {
+    this.index++;
+    var string = '';
+    while(this.index < this.text.length) {
+        var ch = this.text.charAt(this.index);
+        if (ch === quote) {
+            this.index++;
+            this.tokens.push({
+                text: string,
+                value: string
+            });
+            return;
+        } else {
+            string += ch;
+        }
+        this.index++;
+    }
+    throw 'unmatched quote';
+}
+
 //Abstract Syntax Tree (AST) builder
 function AST(lexer) {
 	this.lexer = lexer;
@@ -106,15 +130,23 @@ ASTCompiler.prototype.recurse = function(ast) {
 			this.state.body.push('return ', this.recurse(ast.body), ';');
 			break;
 		case AST.Literal:
-			return ast.value;
+			return this.escape(ast.value);
 	}
+};
+
+ASTCompiler.prototype.escape = function(value) {
+    if (_.isString(value)) {
+        return '\'' + value + '\'';
+    } else {
+        return value;
+    }
 };
 
 function Parser(lexer) {
 	this.lexer = lexer;
 	this.ast = new AST(this.lexer);
 	this.astComiler = new ASTCompiler(this.ast);
-}
+};
 
 Parser.prototype.parse = function(text) {
 	return this.astComiler.compile(text);
