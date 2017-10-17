@@ -14,20 +14,10 @@ function Scope() {
 	this.$$postDigestQueue = [];
   this.$root = this;
 	this.$$children = [];
-  this.$$listeners = {};
 	this.$$phase = null;
 }
 
 function initWatchVal() { }
-
-function isArrayLike(obj) {
-  if(_.isNull(obj) || _.isUndefined(obj)) {
-    return false;
-  }
-  
-  var length = obj.length;
-  return length === 0 || (_.isNumber(length) && length > 0 && (length-1 ) in obj);
-}
 
 /**
  * $watch() registers a listener callback to be executed whenever the watchExpression changes.
@@ -44,7 +34,6 @@ Scope.prototype.$watch = function(watchFn, listenerFn, valueEq) {
 		valueEq: !!valueEq,
 		last: initWatchVal
 	};
-  // Array.prototype.unshift() method adds one or more elements to the beginning of an array and returns the new length of the array.
 	this.$$watchers.unshift(watcher);
 	this.$root.$$lastDirtyWatch = null;
 	return function() {
@@ -66,7 +55,7 @@ Scope.prototype.$watchGroup = function(watchFns, listenerFn) {
 		var shouldCall = true;
 		self.$evalAsync(function() {
 			if (shouldCall) {
-				listenerFn(newValues, newValues, self);	
+				listenerFn(newValues, newValues, self);
 			}
 		});
 		return function(){
@@ -181,7 +170,7 @@ Scope.prototype.$digest = function() {
  * $$areEqual() is using Lodash _isEqual() method to check by value. Checking by value is a more involved operation than just checking
  * a reference. Angular does not do value-based dirty checking by default. You need to explicitly set the flag to enable it.
  * Need to handle value being NaN since NaN(Not-a-Number) is not equal to itself.
- * Lodash: _isEqual(value, other) method performs a deep comparison between two values to determine if they are equivalent. 
+ * Lodash: _isEqual(value, other) method performs a deep comparison between two values to determine if they are equivalent.
  */
 Scope.prototype.$$areEqual = function(newValue, oldValue, valueEq) {
 	if (valueEq) {
@@ -194,18 +183,18 @@ Scope.prototype.$$areEqual = function(newValue, oldValue, valueEq) {
 /**
  * $eval() executes the expression on the current scope and returns the result. Any exceptions in the expression are propagated (uncaught).
  * This is useful when evaluating AngularJS expressions.
- * @param {string or function()} expr - expression 
+ * @param {string or function()} expr - expression
  * @param {object} locals - Local variables object, useful for overriding values in scope.
  * @returns {} - The result of evaluating the expression.
  */
 Scope.prototype.$eval = function(expr, locals) {
-	return expr(this, locals); 
+	return expr(this, locals);
 };
 
 /**
- * $apply() is used to execute an expression in AngularJS from outside of the AngularJS framework. 
+ * $apply() is used to execute an expression in AngularJS from outside of the AngularJS framework.
  * (e.g from browser DOM events, setTimeout, XHR or third party libraries)
- * @param {string} expr - expression 
+ * @param {string} expr - expression
  * @param {function(scope)} expr - expression (execute the function with current scope parameter.)
  */
 Scope.prototype.$apply = function(expr) {
@@ -219,17 +208,17 @@ Scope.prototype.$apply = function(expr) {
 };
 
 /**
- * $evalAsync() executes the expression on the current scope at a later point in time. 
+ * $evalAsync() executes the expression on the current scope at a later point in time.
  * The $evalAsync makes no guarantees as to when the expression will be executed, only that:
  * - it will execute after the function that scheduled the evaluation (preferably before DOM rendering.)
  * - at least one $digest cycle will be performed after expression execution.
- * @param {string or function()} expr - expression 
+ * @param {string or function()} expr - expression
  * @param {object} locals - Local variables object, useful for overriding values in scope.
  */
 Scope.prototype.$evalAsync = function(expr) {
 	var self = this;
 	if (!self.$$phase && !self.$$asyncQueue.length) {
-		// setTimeout call is to prevent confusion if someone was to call $evalAsync from outside a digest.	
+		// setTimeout call is to prevent confusion if someone was to call $evalAsync from outside a digest.
 		setTimeout(function() {
 			if (self.$$asyncQueue.length) {
 				self.$root.$digest();
@@ -244,14 +233,14 @@ Scope.prototype.$$flushApplyAsync = function() {
 		try {
 			this.$$applyAsyncQueue.shift()();
 		} catch (e) {
-			console.error(e);	
+			console.error(e);
 		}
 	}
 	this.$root.$$applyAsyncId = null;
 };
 
 /**
- * $applyAsync() schedule the invocation of $apply to occur at a later time. The actual time difference varies across browsers, 
+ * $applyAsync() schedule the invocation of $apply to occur at a later time. The actual time difference varies across browsers,
  * but is typically around ~10 milliseconds. This can be used to queue up multiple expressions which need to be evaluated in the same digest.
  * @param {string or function()} expr
  */
@@ -280,7 +269,7 @@ Scope.prototype.$clearPhase = function() {
 };
 
 Scope.prototype.$$postDigest = function(fn) {
-	this.$$postDigestQueue.push(fn); 
+	this.$$postDigestQueue.push(fn);
 };
 
 /**
@@ -307,19 +296,17 @@ Scope.prototype.$new = function(isolated, parent) {
   }
   parent.$$children.push(child);
 	child.$$watchers = [];
-  child.$$listeners = {};
 	child.$$children = [];
   child.$parent = parent;
 	return child;
 };
 
 /**
- * $destroy will find the current scope from its parent's $$children array and then remove it. 
+ * $destroy will find the current scope from its parent's $$children array and then remove it.
  * It will also remove the watchers of the scope.
  * @Scope constructor method
  */
 Scope.prototype.$destroy = function() {
-  this.$broadcast('$destroy');
   if (this.$parent) {
     var siblings = this.$parent.$$children;
     var indexOfThis = siblings.indexOf(this);
@@ -328,11 +315,10 @@ Scope.prototype.$destroy = function() {
     }
   }
   this.$$watchers = null;
-  this.$$listeners = {}; 
 };
 
 /**
-  * $watchCollection shallow watches the properties of an object and fires whenever any of the properties change 
+  * $watchCollection shallow watches the properties of an object and fires whenever any of the properties change
   * (for arrays, this implies watching the array items; for object maps, this implies watching the properties).
   * If a change is detected, the listener callback is fired.
   */
@@ -340,67 +326,29 @@ Scope.prototype.$watchCollection = function(watchFn, listenerFn) {
   var self = this;
   var newValue;
   var oldValue;
-  var oldLength;
-	var veryOldValue;
-	var trackVeryOldValue = (listenerFn.length > 1);
   var changeCount = 0;
-	var firstRun = true;
   var internalWatchFn = function(scope) {
-    var newLength;
     newValue = watchFn(scope);
     if (_.isObject(newValue)) {
-      if (isArrayLike(newValue)) {
-          if (!_.isArray(oldValue)) {
-            changeCount++;
-            oldValue = [];
-          } 
-          if (oldValue.length !== newValue.length) {
-            changeCount++;
-            oldValue.length = newValue.length;
-          }
-					_.forEach(newValue, function(newItem, i){
-						var bothNaN = _.isNaN(newItem) && _.isNaN(oldValue[i]);
-						if (!bothNaN && (newItem !== oldValue[i])) {
-							changeCount++;
-							oldValue[i] = newItem;
-						}
-					});
-      } else {
-        if (!_.isObject(oldValue) || isArrayLike(oldValue)) {
+      if (_.isArray(newValue)) {
+        if (!_.isArray(oldValue)) {
           changeCount++;
-          oldValue = {};
-          oldLength = 0;
+          oldValue = [];
         }
-        newLength = 0;
-        _.forOwn(newValue, function(newVal, key) {
-          newLength++;
-          if (oldValue.hasOwnProperty(key)) {
-            // Object attribute is modified.
-            var bothNaN = _.isNaN(newVal) && _.isNaN(oldValue[key]);
-            if (!bothNaN && (oldValue[key] !== newVal)) {
-              changeCount++;
-              oldValue[key] = newVal;
-            }
-          } else {
-            // Object attribute is added.
+        if (newValue.length !== oldValue.length) {
+          changeCount++;
+          oldValue.length = newValue.length;
+        }
+        // detect different array value between newValue and oldValue
+        _.forEach(newValue, function(newItem, i) {
+          if (newItem !== oldValue[i]) {
             changeCount++;
-            oldLength++;
-            oldValue[key] = newVal;
+            oldValue[i] = newItem;
           }
         });
-        // Object attribute is removed.         
-        if (oldLength > newLength) {
-          _.forOwn(oldValue, function(oldVal, key) {
-            if (!newValue.hasOwnProperty(key)) {
-              changeCount++;
-              oldLength--;
-              delete oldValue[key];
-            }
-          });
-        }
+      } else {
       }
     } else {
-      // NaNs are not equal to each other.
       if (!self.$$areEqual(newValue, oldValue, false)) {
         changeCount++;
       }
@@ -409,90 +357,9 @@ Scope.prototype.$watchCollection = function(watchFn, listenerFn) {
     return changeCount;
   };
   var internalListenerFn = function() {
-		if (firstRun) {
-			listenerFn(newValue, newValue, self);
-			firstRun = false;
-		} else {
-			listenerFn(newValue, veryOldValue, self);
-		}
-		if (trackVeryOldValue) {
-			veryOldValue = _.clone(newValue);
-		}
+    listenerFn(newValue, oldValue, self);
   };
   return this.$watch(internalWatchFn, internalListenerFn);
-};
-
-Scope.prototype.$on = function(eventName, listener) {
-  var listeners = this.$$listeners[eventName];
-  // [] is truthy. The only values that are falsey are: null, undefined, 0, NaN, "", false
-  if (!listeners) { // !undefined => true
-    this.$$listeners[eventName] = listeners = [];
-  }
-  listeners.push(listener);
-  return function() {
-    var index = listeners.indexOf(listener);
-    if (index >= 0) {
-      listeners[index] = null;
-    }
-  };
-};
-
-Scope.prototype.$emit = function(eventName) {
-	var propagationStopped = false;
-	var event = {
-		name: eventName, 
-		targetScope: this, 
-		stopPropagation: function() {
-			propagationStopped = true;
-		},
-		preventDefault: function() {
-			event.defaultPrevented = true;
-		}
-	};
-	var listenerArgs = [event].concat(_.tail(arguments));
-  var scope = this;
-  do {
-    event.currentScope = scope;
-    scope.$$fireEventOnScope(eventName, listenerArgs);
-    scope = scope.$parent;
-  } while (scope && !propagationStopped);
-  event.currentScope = null;
-	return event;
-};
-
-Scope.prototype.$broadcast = function(eventName) {
-	var event = {
-		name: eventName, 
-		targetScope: this,
-		preventDefault: function() {
-			event.defaultPrevented = true;
-		}
-	};
-  var listenerArgs = [event].concat(_.tail(arguments));
-	this.$$everyScope(function(scope){
-    event.currentScope = scope;
-		scope.$$fireEventOnScope(eventName, listenerArgs);
-		return true;
-	});
-  event.currentScope = null;
-	return event;
-};
-
-Scope.prototype.$$fireEventOnScope = function(eventName, listenerArgs) {
-  var listeners = this.$$listeners[eventName] || [];
-  var i = 0;
-  while (i < listeners.length){
-    if (listeners[i] === null) {
-      listeners.splice(i, 1);
-    } else {
-      try {
-         listeners[i].apply(null, listenerArgs);
-      } catch(e) {
-        console.error(e);
-      }
-        i++;
-    }
-  }
 };
 
 module.exports = Scope;
