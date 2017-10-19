@@ -48,7 +48,11 @@ describe('parse', function() {
       var fn = parse("'abc'");
       expect(fn()).toBe('abc');
   });
-  fit('will not parse a string with mismatching quotes', function() {
+  it('will not parse a string with mismatching quotes', function() {
       expect(function() { parse('"abc\'');}).toThrow();
+  });
+  fit('can parse a string with single quotes inside', function() {
+      var fn = parse("'a\\\'b'");
+      expect(fn()).toBe('a\'b');
   });
 });

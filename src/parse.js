@@ -1,5 +1,6 @@
 'use strict';
 var _ = require('lodash');
+var ESCAPES = {'n': '\n', 'f': '\f', 'r': '\r', 't': '\t', 'v': '\v', '\'': '\'', '"': '"'};
 
 function parse(expr) {
 	var lexer = new Lexer();
@@ -73,15 +74,26 @@ Lexer.prototype.readNumber = function() {
 Lexer.prototype.readString = function(quote) {
     this.index++;
     var string = '';
+    var escape = false;
     while(this.index < this.text.length) {
         var ch = this.text.charAt(this.index);
-        if (ch === quote) {
+        if (escape) {
+            var replacement = ESCAPES[ch];
+            if (replacement) {
+                string += replacement;
+            } else {
+                string += ch;
+            }
+            escape = false;
+        } else if (ch === quote) {
             this.index++;
             this.tokens.push({
                 text: string,
                 value: string
             });
             return;
+        } else if (ch === '\\') {
+            escape = true;
         } else {
             string += ch;
         }
@@ -136,6 +148,15 @@ ASTCompiler.prototype.recurse = function(ast) {
 
 ASTCompiler.prototype.escape = function(value) {
     if (_.isString(value)) {
+//        var string = '';
+//        for (var i=0; i<value.length; i++) {
+//            var replacement = ESCAPES[value[i]];
+//            if (replacement) {
+//                string += replacement;
+//            } else {
+//                string += value[i];
+//            }
+//        }
         return '\'' + value + '\'';
     } else {
         return value;
