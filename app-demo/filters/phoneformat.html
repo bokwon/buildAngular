@@ -5,10 +5,35 @@
 		<script type="text/javascript">
 			(function() {
 				var app = angular.module("app", []);
-				app.controller("AppCtrl", function($scope){
-						$scope.phone = "1234567890";
+				app.controller("AppCtrl", function($scope) {
+            var vm = this;
+            
+						vm.phone = "1234567890";
 				});
-				
+          
+        app.directive("idgPhoneNumber", function($filter) {
+            function link(scope, element, attrs) {
+                console.log(element); 
+                scope.inputValue = scope.phonenumber;
+                
+                scope.$watch('inputValue', function(value) {
+                    value = String(value);
+                    var number = value.replace(/[^0-9]+/g, '');
+                    scope.phonenumber = number;
+                    scope.inputValue = $filter('tel')(number);
+                })
+            }
+            
+            return {
+                link: link,
+                restrict: "E",
+                scope: {
+                    phonenumber: "=model"
+                },
+                template: "<input ng-model='inputValue' type='tel' title='Phonenumber (Format: (999) 999-9999)'>"
+            }
+        });
+          
 			 // The returned function gets invoked each time Angular calls the filter, which means two-way binding for our filters. The user makes a change, the filter runs again and updates as necessary. 
 				app.filter("tel", function() {
 					return function(tel) {
@@ -38,9 +63,10 @@
 		</script>
 	</head>
 	<body ng-app="app">
-		<div ng-controller="AppCtrl">
-<!--			<idg-phone-number ng-model="phone"></idg-phone-number>-->
-			{{phone | tel}}
+		<div ng-controller="AppCtrl as vm">
+      {{vm.phone | tel}}
+      <br>  
+			<idg-phone-number model="vm.phone"></idg-phone-number>
 		</div>
 		
 	</body>
