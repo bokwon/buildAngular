@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+		<script type="text/javascript">
+			(function() {
+				var app = angular.module("app", []);
+				app.controller("AppCtrl", function($scope) {
+					var vm = this;
+					$scope.customer1 = {
+						name: "Bo",
+						address: "1600 lakeside drive"
+					};
+					$scope.customer2 = {
+						name: "Paul",
+						address: "1601 test drive"
+					};
+				});
+				
+				app.directive("myCustomer", function() {
+					return {
+						restrict: "E",
+						//templateUrl can also be a function which returns the URL of an HTML template to be loaded and used for the directive. templateUrl function with two parameters: the element that the directive was called on, and an attr object associated with that element.
+						templateUrl: "my-customer.html",
+						// scope option is an object that contains a property for each isolated scope binding. 
+						// Its name (customerInfo) corresponds to the directive's isolated scope property, customerInfo.
+						// Its value (=info) tells $compile to bind to the info attribute.
+						scope: {
+							customerInfo: "=info" // or "=" for cases where the attribute name is the same as the value.
+						}
+					};
+				});
+			})();
+		</script>
+	</head>
+	<body ng-app="app">
+		<div ng-controller="AppCtrl as vm">
+			<my-customer info="customer1"></my-customer>
+			<my-customer info="customer2"></my-customer>
+		</div>
+	</body>
+</html>

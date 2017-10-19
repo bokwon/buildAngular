@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+		<script type="text/javascript">
+			(function() {
+				var app = angular.module("app", []);
+				// Directives that want to modify the DOM typically use the link option to register DOM listeners as well as update the DOM. It is executed after the template has been cloned and is where directive logic will be put.
+				app.controller("AppCtrl", function($scope) {
+					$scope.format = "M/d/yy h:mm:ss a";
+				});
+				
+				// Filters are usually used in view expressions, but they can also be used in your JS code. Filters are injected by appending string Filter to the filter name (eg, date -> dateFilter)
+				app.directive("myCurrentTime", function($interval, dateFilter) {
+					function link(scope, element, attrs) {
+						var format,
+								timeoutId;
+						
+						function updateTime() {
+							element.text(dateFilter(new Date(), format));
+						}
+						
+						scope.$watch(attrs.myCurrentTime, function(value) {
+							format = value;
+							updateTime();
+						});
+						
+						element.on("$destroy", function() {
+							$interval.cancel(timeoutId);
+						});
+						
+						timeoutId = $interval(function() {
+							updateTime();
+						}, 1000);
+					}
+					
+					return {
+						link: link
+					}
+				});
+				
+			})();
+		</script>
+	</head>
+	<body ng-app="app">
+		<div ng-controller="AppCtrl">
+			Date format: <input ng-model="format"><hr/>
+			Current time is: <span my-current-time="format"></span>
+		</div>
+	</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+		<script type="text/javascript">
+			(function() {
+				var app = angular.module("app", []);
+				app.controller("AppCtrl", function($scope){
+						$scope.phone = "1234567890";
+				});
+				
+			 // The returned function gets invoked each time Angular calls the filter, which means two-way binding for our filters. The user makes a change, the filter runs again and updates as necessary. 
+				app.filter("tel", function() {
+					return function(tel) {
+							if (!tel) { return ''; }
+							
+							tel = String(tel);
+						
+							var formattedTel = tel;
+						
+							var area = tel.substring(0, 3);
+							var front = tel.substring(3, 6);
+						  var end = tel.substring(6, 10);
+						
+						  if (front) {
+								formattedTel = ("(" + area + ") " + front);
+							} 
+						
+							if (end) {
+								formattedTel += ("-" + end);
+							}
+						
+							return formattedTel;
+					}
+				});
+				
+			})();
+		</script>
+	</head>
+	<body ng-app="app">
+		<div ng-controller="AppCtrl">
+<!--			<idg-phone-number ng-model="phone"></idg-phone-number>-->
+			{{phone | tel}}
+		</div>
+		
+	</body>
+</html>

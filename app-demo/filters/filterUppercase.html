@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
+		<script type="text/javascript"> 
+			(function(){
+				var app = angular.module("app", []);
+				app.controller("AppCtrl", function($scope) {
+					var vm = this;
+					
+					vm.name = "bo kwon";
+				});
+				
+				app.filter("makeUpperCase", function() {
+					return function(item) {
+						return item.toUpperCase();
+					}
+				});
+			})();
+		</script> 
+	</head>
+	<body ng-app="app">
+		<div ng-controller="AppCtrl as ac">
+			<p>{{ac.name | makeUpperCase}}</p>
+		</div>
+		
+	</body>
+</html>
