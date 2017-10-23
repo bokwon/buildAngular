@@ -1,0 +1,81 @@
+<!--https://developers.google.com/web/fundamentals/primers/promises#whats-all-the-fuss-about-->
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript">
+            (function(){
+            // Promise constructor takes one argument, a callback with two parameters, resolve and reject. Do something within the callback, perhaps async, then call resolve if everything worked, otherwise call reject.
+            // then() takes two arguments, a callback for a success case, and another for the failure case. 
+                function get(url) {
+                    return new Promise(function(resolve, reject) {
+                        var req = new XMLHttpRequest();
+                        req.open('GET', url);
+                        
+                        // XMLHttpRequestEventTarget.onload is the function called when an XMLHttpRequest transaction completes successfully.
+                        // XMLHttpRequest.onload = callback;
+                        req.onload = function() {
+                            if(req.status == 200) {
+                                resolve(req.response);
+                            } else {
+                                reject(Error(req.statusText));
+                            }
+                        };
+                        
+                        // XMLHttpRequestEventTarget.onerror is the function called when an XMLHttpRequest transaction fails due to an error.
+                        // XMLHttpRequest.onerror = callback;
+                        req.onerror = function() {
+                            reject(Error("Network Error"));
+                        };
+                       
+                        // XMLHttpRequest.send() method sends the request. If the request is asynchronous(which is the default), this method returns as soon as the request is sent. If the request is synchronus, this method doesn't return until the response has arrived. Return value is void.
+                        req.send();
+                    });
+                }
+                
+                function getJSON(url) {
+                    return get(url).then(JSON.parse).catch(function(err) {
+                        console.log("getJSON failed for", url, err);
+                        throw err;
+                    });
+                }
+                
+                var stroyPromise;
+                
+                function getChapter(i) {
+                    stroyPromise = stroyPromise || getJSON('story.json');
+                    
+                    return stroyPromise.then(function(story) {
+                        return getJSON(story.chapterUrls[i]);
+                    })
+                }
+                
+                getChapter(0).then(function(chapter) {
+                    console.log(chapter);
+                    return getChapter(1);
+                }).then(function(chapter) {
+                    console.log(chapter);
+                })
+                
+                //getJSON('story.json').then(function(story) {
+                //    return getJSON(story.chapterUrls[0]);
+                //}).then(function(chapter1) {
+                //    console.log("Got Chapter 1!", chapter1);
+                //})
+                
+                //get('story.json').then(function(response){
+                //    return JSON.parse(response);
+                //}).then(function(response) {
+                //    console.log("Yey JSON!", response);
+                //})
+            })();
+        </script>
+    </head>
+    <body>
+<!--
+        Promise is an object representing the eventual completion or failure of an asynchronous operation.
+        asynchronous function call - Guarantees, Chaining, Error propagation
+        
+        Promises solve a fundamental flaw with the callback pyramid of doom, by catching all errors, even thrown exceptions and programming errors. 
+-->
+    </body>
+</html>
