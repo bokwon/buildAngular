@@ -78,11 +78,20 @@ Lexer.prototype.readString = function(quote) {
     while(this.index < this.text.length) {
         var ch = this.text.charAt(this.index);
         if (escape) {
-            var replacement = ESCAPES[ch];
-            if (replacement) {
-                string += replacement;
+            if (ch === 'u') {
+                var hex = this.text.substring(this.index + 1, this.index + 5);
+                if (!hex.match(/[\da-f]{4}/i)) {
+                    throw 'Invalid unicode escape';
+                }
+                this.index += 4;
+                string += String.fromCharCode(parseInt(hex, 16));
             } else {
-                string += ch;
+                var replacement = ESCAPES[ch];
+                if (replacement) {
+                    string += replacement;
+                } else {
+                    string += ch;
+                }
             }
             escape = false;
         } else if (ch === quote) {
@@ -146,18 +155,15 @@ ASTCompiler.prototype.recurse = function(ast) {
 	}
 };
 
+ASTCompiler.prototype.stringEscapeRegex = /[^a-zA-Z0-9]/g;
+
+ASTCompiler.prototype.stringEscapeFn = function(c) {
+    return '\\u' + ('00' + c.charCodeAt(0).toString(16));
+}
+
 ASTCompiler.prototype.escape = function(value) {
     if (_.isString(value)) {
-//        var string = '';
-//        for (var i=0; i<value.length; i++) {
-//            var replacement = ESCAPES[value[i]];
-//            if (replacement) {
-//                string += replacement;
-//            } else {
-//                string += value[i];
-//            }
-//        }
-        return '\'' + value + '\'';
+        return '\'' + value.replace(this.stringEscapeRegex, this.stringEscapeFn) + '\'';
     } else {
         return value;
     }

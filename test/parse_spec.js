@@ -49,10 +49,21 @@ describe('parse', function() {
       expect(fn()).toBe('abc');
   });
   it('will not parse a string with mismatching quotes', function() {
-      expect(function() { parse('"abc\'');}).toThrow();
+      expect(function() { parse('"abc\''); }).toThrow();
   });
-  fit('can parse a string with single quotes inside', function() {
+  it('can parse a string with single quotes inside', function() {
       var fn = parse("'a\\\'b'");
       expect(fn()).toBe('a\'b');
+  });
+  it('can parse a string with double quotes inside', function() {
+      var fn = parse('"a\\\"b"');
+      expect(fn()).toBe('a\"b')
+  });
+  it('will parse a string with unicode escapes', function() {
+      var fn = parse('"\\u00A0"');
+      expect(fn()).toEqual('\u00a0');
+  });
+  fit('will not parse a string with invalid uncode escapes', function() {
+      expect(function() { parse('"\\u00T0"'); }).toThrow();
   });
 });
