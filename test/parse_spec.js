@@ -63,7 +63,23 @@ describe('parse', function() {
       var fn = parse('"\\u00A0"');
       expect(fn()).toEqual('\u00a0');
   });
-  fit('will not parse a string with invalid uncode escapes', function() {
+  it('will not parse a string with invalid uncode escapes', function() {
       expect(function() { parse('"\\u00T0"'); }).toThrow();
   });
+	it('will parse null', function() {
+		var fn = parse('null');
+		expect(fn()).toBe(null);
+	});
+	it('will parse true', function() {
+		var fn = parse('true');
+		expect(fn()).toBe(true);
+	});
+	it('will parse false', function() {
+		var fn = parse('false');
+		expect(fn()).toBe(false);
+	});
+	it('ignore whitespace', function() {
+		var fn = parse(' \n42 ');
+		expect(fn()).toEqual(42);
+	});
 });
