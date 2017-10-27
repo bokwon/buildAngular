@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html>
 	<head>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" type="text/css" rel="stylesheet">
+    <style>
+        .phone
+        {
+            padding: 20px;
+        }
+        
+        .phoneinput > input
+        {
+            padding: 10px;
+        }
+    </style>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.5/angular.min.js"></script>
 		<script type="text/javascript">
 			(function() {
@@ -8,19 +20,17 @@
 				app.controller("AppCtrl", function($scope) {
             var vm = this;
             
-						vm.phone = "1234567890";
+						vm.phone = "";
 				});
           
         app.directive("idgPhoneNumber", function($filter) {
             function link(scope, element, attrs) {
-                console.log(element); 
                 scope.inputValue = scope.phonenumber;
                 
-                scope.$watch('inputValue', function(value) {
-                    value = String(value);
-                    var number = value.replace(/[^0-9]+/g, '');
+                scope.$watch("inputValue", function(newVal) {                    
+                    var number = String(newVal).replace(/[^0-9]+/g, '');
                     scope.phonenumber = number;
-                    scope.inputValue = $filter('tel')(number);
+                    scope.inputValue = $filter("tel")(number);
                 })
             }
             
@@ -61,11 +71,11 @@
 		</script>
 	</head>
 	<body ng-app="app">
-		<div ng-controller="AppCtrl as vm">
-      {{vm.phone | tel}}
-      <br>  
-			<idg-phone-number model="vm.phone"></idg-phone-number>
-		</div>
-		
+    <div class="container-fluid">
+        <div ng-controller="AppCtrl as vm" class="col-xs-12 phone">
+            Phone number: 
+            <idg-phone-number model="vm.phone" class="phoneinput"></idg-phone-number>
+		    </div>
+    </div>		
 	</body>
 </html>
