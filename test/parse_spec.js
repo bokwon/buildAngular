@@ -82,4 +82,8 @@ describe('parse', function() {
 		var fn = parse(' \n42 ');
 		expect(fn()).toEqual(42);
 	});
+  fit('will parse an empty array', function() {
+      var fn = parse("[]");
+      expect(fn()).toEqual([]);
+  });
 });
